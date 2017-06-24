@@ -1,0 +1,23 @@
+---
+# tasks file for install-rabbitmq-server
+- name: Install rabbitmq server
+  apt:
+    name: rabbitmq-server
+    state: present
+  become: yes
+  become_method: sudo
+
+- name: Update rabbitmq guest password
+  rabbitmq_user:
+    user: guest
+    password: "{{ rabbitmq_password }}"
+  become: yes
+  become_method: sudo
+
+- name: rabbitmq server status
+  shell: rabbitmqctl status
+  register: rabbitmq_status
+  become: yes
+  become_method: sudo
+
+#- debug: var=rabbitmq_status

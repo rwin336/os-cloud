@@ -1,0 +1,3 @@
+---
+# vars file for install-rabbitmq-server
+rabbitmq_password: openstack1

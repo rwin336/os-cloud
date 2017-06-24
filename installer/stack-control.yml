@@ -2,4 +2,6 @@
 - hosts: control
 
   roles:
+    - install-rabbitmq-server
     - install-backend-db
+
