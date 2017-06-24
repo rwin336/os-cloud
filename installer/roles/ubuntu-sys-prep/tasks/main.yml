@@ -1,0 +1,108 @@
+---
+# tasks file for ubuntu-sys-prep
+
+- name: Update apt cache and perfrom dist-upgrade
+  apt:
+    upgrade: dist
+    update_cache: yes
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install package that will purge old kernels
+  apt:
+    name: byobu
+  become: yes
+  become_method: sudo
+
+- name: Install git
+  apt:
+    name: git
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install python-pip
+  apt:
+    name: python-pip
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install python-dev
+  apt:
+    name: python-dev
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install libxml2-dev
+  apt:
+    name: libxml2-dev
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install libxslt1-dev
+  apt:
+    name: libxslt1-dev
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install python-lxml
+  apt:
+    name: python-lxml
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install python-configobj
+  apt:
+    name:  python-configobj
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install python-routes
+  apt:
+    name: python-routes
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install libmysqlclient-dev
+  apt:
+    name: libmysqlclient-dev
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install  mysql-python
+  pip:
+    name: mysql-python
+    state: present
+  become: yes
+  become_method: sudo
+
+- name: Install python-tox
+  apt: 
+    name: python-tox
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install openvswitch-switch
+  apt:
+    name: openvswitch-switch
+    force: yes
+  become: yes
+  become_method: sudo
+
+- name: Install ntp
+  apt:
+    name: ntp
+    force: yes
+  become: yes
+  become_method: sudo
+
