@@ -1,5 +1,0 @@
----
-- hosts: controllers
-
-  roles:
-    - install-backend-db

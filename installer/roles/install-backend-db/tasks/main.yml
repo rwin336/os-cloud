@@ -1,2 +1,36 @@
 ---
 # tasks file for install-backend-db
+
+## Debconf-utils needed to get the database password without interacting
+## with the mysql install
+- name: Install debconf-utils
+  apt:
+    pkg: debconf-utils
+    state: present
+  become: yes
+  become_method: sudo
+
+- name: Add mysql root password to debconf
+  debconf:
+    name: mysql-server
+    question: mysql-server/root_password
+    vtype: password
+    value: "{{ db_password }}"
+  become: yes
+  become_method: sudo
+
+- name: Add mysql root password again to debconf
+  debconf:
+    name: mysql-server
+    question: mysql-server/root_password_again
+    vtype: password
+    value: "{{ db_password }}"
+  become: yes
+  become_method: sudo
+
+- name: Install mySQL package
+  apt:
+    pkg: mysql-server
+    state: present
+  become: yes
+  become_method: sudo
