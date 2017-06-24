@@ -1,0 +1,27 @@
+
+Ansible command line
+
+A collection of ansible command line examples used.
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Ansible ping hosts
+
+$ cd $WORKSPACE/installer
+
+## Verbose output
+$ ansible -i staging stack-nodes -vvvv -m ping
+
+## Standard output
+$ ansible -i production control -m ping
+10.23.229.71 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+10.23.229.76 | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+
+
+
+========================================================================

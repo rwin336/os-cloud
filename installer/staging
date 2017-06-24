@@ -1,0 +1,23 @@
+[control]
+10.23.229.71
+10.23.229.76
+
+[control:vars]
+ansible_ssh_user=ubuntu
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+
+
+[compute]
+
+[compute:vars]
+
+[block-storage]
+
+[block-storage:vars]
+
+[object-storage]
+
+[object-storage:vars]
+
+

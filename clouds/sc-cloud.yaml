@@ -1,0 +1,26 @@
+HOST_CLOUD:
+  ip_address: 127.0.0.1
+  admin_user: root
+  admin_password: changeit
+  os_aut_url: https://127.0.0.1:5000/v3
+  os_cacert: /tmp/haproxy-ca.crt
+  os_username: admin
+  os_password: abcdef1234567890
+  os_region_name: RegionOne
+  os_project_name: admin
+  os_project_domain_name: default
+  os_user_domain_name: default
+  os_identity_api_version: 3
+
+OS_STACK:
+  name: os-stack
+  heat_template: os-stack.yaml
+
+BASE_IMAGE:
+  location: http://cloud-images.ubuntu.com/xenial/current
+  name: xenial-server-cloudimg-amd64-disk1.img
+
+NETWORKING:
+  domain_name: my-company.com
+  domain_name_servers: [10.10.10.1, 10.10.10.2]
+  

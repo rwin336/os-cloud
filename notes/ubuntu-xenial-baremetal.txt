@@ -1,0 +1,13 @@
+Ubuntu Xenial Baremetal install notes.
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Problem:
+  Ansible ping failed after fresh install of xenial-server-cloudimg-amd64-disk1.img
+  for '/usr/bin/python' not found
+
+Solution:
+  Install python-minimal on each node
+
+  $ sudo apt-get install python-minimal
+
+#=======================================================================
