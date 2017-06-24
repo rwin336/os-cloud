@@ -1,0 +1,18 @@
+---
+# tasks file for reboot-nodes
+- name: reboot nodes
+  shell: sleep 2 && shutdown -r now "Openstack node reboot"
+  async: 1
+  poll: 0
+  ignore_errors: true
+  become: yes
+  become_method: sudo
+
+- name: wait for server to come back
+  local_action: wait_for
+  args:
+    host: "{{ inventory_hostname }}"
+    port: 22
+    state: started
+    delay: 30
+    timeout: 300
