@@ -28,9 +28,32 @@
   become: yes
   become_method: sudo
 
+- name: Install python-mysqldb package
+  apt:
+    pkg: python-mysqldb
+    state: present
+  become: yes
+  become_method: sudo
+  
 - name: Install mySQL package
   apt:
     pkg: mysql-server
     state: present
   become: yes
   become_method: sudo
+
+- name: Update bind-address of mysql
+  ini_file: dest=/etc/my.cnf
+            section=mysqld
+            option=bind-address
+            value='0.0.0.0'
+  become: yes
+  become_method: sudo
+
+- name: Restart mysql service
+  service:
+    name: mysql
+    state: restarted
+  become: yes
+  become_method: sudo
+  
