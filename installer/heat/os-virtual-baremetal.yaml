@@ -1,0 +1,216 @@
+heat_template_version: 2015-04-30
+
+# description of the template
+description: "Heat template creates virtual baremetal infrastructure for installing Openstack."
+
+# declaration of input parameter groups and order
+#parameter_groups:
+
+# declaration of input parameters
+parameters:
+  external_network:
+    default: ""
+    description: "UUID of the external network"
+    type: "string"
+    hidden: false
+    constraints:
+      - custom_constraint: neutron.network
+  SSHPublicKey2:
+    default: ""
+    type: "string"
+    hidden: true
+
+# declaration of template resources
+resources:
+  SSHKeyPair2:
+    type: "OS::Nova::KeyPair"
+    properties:
+      name: "key2"
+      public_key:
+        get_param: "SSHPublicKey2"
+      save_private_key: "False"
+  instance_security_group1:
+    type: "OS::Neutron::SecurityGroup"
+    properties:
+      name: "instance_security_group1"
+      rules:
+        - protocol: "icmp"
+        - protocol: "udp"
+          port_range_min: 514
+          port_range_max: 515
+        - protocol: "tcp"
+          port_range_min: 601
+          port_range_max: 602
+        - protocol: "tcp"
+          port_range_min: 6514
+          port_range_max: 6514
+        - protocol: "tcp"
+          port_range_min: 22
+          port_range_max: 22
+        - protocol: "tcp"
+          port_range_min: 80
+          port_range_max: 80
+        - protocol: "tcp"
+          port_range_min: 443
+          port_range_max: 443
+  mgmt_network_02:
+    type: "OS::Neutron::Net"
+    properties:
+      name: "mgmt-network-02"
+  mgmt_subnet_02:
+    type: "OS::Neutron::Subnet"
+    properties:
+      name: "mgmt-subnet-02"
+      cidr: "192.168.202.0/24"
+      dns_nameservers:
+        - "171.70.168.183"
+        - "173.36.131.10"
+      enable_dhcp: "True"
+      gateway_ip: "192.168.202.1"
+      network_id:
+        get_resource: "mgmt_network_02"
+  mgmt_network_03:
+    type: "OS::Neutron::Net"
+    properties:
+      name: "mgmt-network-03"
+  mgmt_subnet_03:
+    type: "OS::Neutron::Subnet"
+    properties:
+      name: "mgmt-subnet-03"
+      cidr: "192.168.203.0/24"
+      dns_nameservers:
+        - "171.70.168.183"
+        - "173.36.131.10"
+      enable_dhcp: "True"
+      gateway_ip: "192.168.203.1"
+      network_id:
+        get_resource: "mgmt_network_03"
+  router_01:
+    type: "OS::Neutron::Router"
+    properties:
+      admin_state_up: "True"
+      name: "os-router"
+  router_01_gw:
+    type: "OS::Neutron::RouterGateway"
+    properties:
+      network_id:
+        get_param: "external_network"
+      router_id:
+        get_resource: "router_01"
+  router_int1:
+    type: "OS::Neutron::RouterInterface"
+    properties:
+      router_id:
+        get_resource: "router_01"
+      subnet_id:
+        get_resource: "mgmt_subnet_02"
+  router_int2:
+    type: "OS::Neutron::RouterInterface"
+    properties:
+      router_id:
+        get_resource: "router_01"
+      subnet_id:
+        get_resource: "mgmt_subnet_03"
+  instance0_port0:
+    type: "OS::Neutron::Port"
+    properties:
+      admin_state_up: "True"
+      network_id:
+        get_resource: "mgmt_network_02"
+      security_groups:
+        -
+          get_resource: "instance_security_group1"
+  floating_ip_instance0_port0:
+    type: "OS::Neutron::FloatingIP"
+    properties:
+      floating_network_id:
+        get_param: "external_network"
+  floating_ip_assoc_01:
+    type: "OS::Neutron::FloatingIPAssociation"
+    properties:
+      floatingip_id:
+        get_resource: "floating_ip_instance0_port0"
+      port_id:
+        get_resource: "instance0_port0"
+  instance1_port0:
+    type: "OS::Neutron::Port"
+    properties:
+      admin_state_up: "True"
+      network_id:
+        get_resource: "mgmt_network_03"
+      security_groups:
+        -
+          get_resource: "instance_security_group1"
+  floating_ip_instance1_port0:
+    type: "OS::Neutron::FloatingIP"
+    properties:
+      floating_network_id:
+        get_param: "external_network"
+  floating_ip_assoc_02:
+    type: "OS::Neutron::FloatingIPAssociation"
+    properties:
+      floatingip_id:
+        get_resource: "floating_ip_instance1_port0"
+      port_id:
+        get_resource: "instance1_port0"
+  instance0:
+    type: "OS::Nova::Server"
+    properties:
+      name: "mgmt-instance-01"
+      image: "xenial-16.04"
+      flavor: "m1.xlarge"
+      key_name:
+        get_resource: "SSHKeyPair2"
+      admin_user: cloud-user
+      user_data_format: RAW
+      networks:
+        - port:
+            get_resource: "instance0_port0"
+  instance2:
+    type: "OS::Nova::Server"
+    properties:
+      name: "mgmt-instance-02"
+      image: "xenial-16.04"
+      flavor: "m1.xlarge"
+      key_name:
+        get_resource: "SSHKeyPair2"
+      admin_user: cloud-user
+      user_data_format: RAW
+      networks:
+        - port:
+            get_resource: "instance1_port0"
+  instance0_data:
+    type: "OS::Cinder::Volume"
+    properties:
+      size: "10"
+  instance0_data_attach:
+    type: "OS::Cinder::VolumeAttachment"
+    properties:
+      instance_uuid:
+        get_resource: "instance0"
+      volume_id:
+        get_resource: "instance0_data"
+      mountpoint: /dev/vdc
+  instance2_data:
+    type: "OS::Cinder::Volume"
+    properties:
+      size: "10"
+  instance2_data_attach:
+    type: "OS::Cinder::VolumeAttachment"
+    properties:
+      instance_uuid:
+        get_resource: "instance2"
+      volume_id:
+        get_resource: "instance2_data"
+      mountpoint: /dev/vdc
+
+# declaration of output parameters
+outputs:
+  instance0_ip:
+    description: Floating IP address of the deployed instance0
+    value: { get_attr: [floating_ip_instance0_port0, floating_ip_address] }
+  instance1_ip:
+    description: IP address of the deployed instance1
+    value: { get_attr: [floating_ip_instance1_port0, floating_ip_address] }
+
+
