@@ -9,14 +9,14 @@ description: "Heat template creates virtual baremetal infrastructure for install
 # declaration of input parameters
 parameters:
   external_network:
-    default: ""
+    default: "d8c7b8e7-66e0-48de-b98c-ef4040615564"
     description: "UUID of the external network"
     type: "string"
     hidden: false
     constraints:
       - custom_constraint: neutron.network
   SSHPublicKey2:
-    default: ""
+    default: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5DeNpqxIYz9mRHMqu2ii5uN04xA/DWtPaMmzfJZA6nhevQQK7moADydSR1MgJb9BTtOYFFq21hx0zDdGD22XM4DgAU4LCL0kXNCTQitWaYSrxhvkFHsSWSjnv/Wyp55/Yh3jxgJ3pdbXmJsWxstt0KpR7lynOwFPyRVG0GJBPE5Qus5xgyluJjy+Z/z6MCPzQy84soeX4k9l/HGFrKuCKvx96uxaF/mcnIrz7tt7FXWKmvS7OjOVtwlHiHogOvCqG/P5WoSvE7+QYEQ/bRaHzLOJhWz6l8Jf7Ho8oZTkiKg3ozFn+E8LkFNSGWuO8ykkIeEo7Uc9fXXaKVOs3gvp7 riwinter@ubuntu"
     type: "string"
     hidden: true
 
@@ -29,21 +29,13 @@ resources:
       public_key:
         get_param: "SSHPublicKey2"
       save_private_key: "False"
+
   instance_security_group1:
     type: "OS::Neutron::SecurityGroup"
     properties:
       name: "instance_security_group1"
       rules:
         - protocol: "icmp"
-        - protocol: "udp"
-          port_range_min: 514
-          port_range_max: 515
-        - protocol: "tcp"
-          port_range_min: 601
-          port_range_max: 602
-        - protocol: "tcp"
-          port_range_min: 6514
-          port_range_max: 6514
         - protocol: "tcp"
           port_range_min: 22
           port_range_max: 22
@@ -53,14 +45,15 @@ resources:
         - protocol: "tcp"
           port_range_min: 443
           port_range_max: 443
-  mgmt_network_02:
+
+  mgmt_network:
     type: "OS::Neutron::Net"
     properties:
-      name: "mgmt-network-02"
-  mgmt_subnet_02:
+      name: "mgmt-network"
+  mgmt_subnet:
     type: "OS::Neutron::Subnet"
     properties:
-      name: "mgmt-subnet-02"
+      name: "mgmt-subnet"
       cidr: "192.168.202.0/24"
       dns_nameservers:
         - "171.70.168.183"
@@ -68,15 +61,16 @@ resources:
       enable_dhcp: "True"
       gateway_ip: "192.168.202.1"
       network_id:
-        get_resource: "mgmt_network_02"
-  mgmt_network_03:
+        get_resource: "mgmt_network"
+
+  api_network:
     type: "OS::Neutron::Net"
     properties:
-      name: "mgmt-network-03"
-  mgmt_subnet_03:
+      name: "api-network"
+  api_subnet:
     type: "OS::Neutron::Subnet"
     properties:
-      name: "mgmt-subnet-03"
+      name: "api-subnet"
       cidr: "192.168.203.0/24"
       dns_nameservers:
         - "171.70.168.183"
@@ -84,7 +78,42 @@ resources:
       enable_dhcp: "True"
       gateway_ip: "192.168.203.1"
       network_id:
-        get_resource: "mgmt_network_03"
+        get_resource: "api_network"
+
+  storage_network:
+    type: "OS::Neutron::Net"
+    properties:
+      name: "storage-network"
+  storage_subnet:
+    type: "OS::Neutron::Subnet"
+    properties:
+      name: "storage-subnet"
+      cidr: "192.168.204.0/24"
+      dns_nameservers:
+        - "171.70.168.183"
+        - "173.36.131.10"
+      enable_dhcp: "True"
+      gateway_ip: "192.168.204.1"
+      network_id:
+        get_resource: "storage_network"
+
+  tenant_network:
+    type: "OS::Neutron::Net"
+    properties:
+      name: "tenant-network"
+  tenant_subnet:
+    type: "OS::Neutron::Subnet"
+    properties:
+      name: "tenant-subnet"
+      cidr: "192.168.205.0/24"
+      dns_nameservers:
+        - "171.70.168.183"
+        - "173.36.131.10"
+      enable_dhcp: "True"
+      gateway_ip: "192.168.205.1"
+      network_id:
+        get_resource: "tenant_network"
+
   router_01:
     type: "OS::Neutron::Router"
     properties:
@@ -97,29 +126,59 @@ resources:
         get_param: "external_network"
       router_id:
         get_resource: "router_01"
+
   router_int1:
     type: "OS::Neutron::RouterInterface"
     properties:
       router_id:
         get_resource: "router_01"
       subnet_id:
-        get_resource: "mgmt_subnet_02"
+        get_resource: "mgmt_subnet"
+
   router_int2:
     type: "OS::Neutron::RouterInterface"
     properties:
       router_id:
         get_resource: "router_01"
       subnet_id:
-        get_resource: "mgmt_subnet_03"
+        get_resource: "api_subnet"
+
+  router_int3:
+    type: "OS::Neutron::RouterInterface"
+    properties:
+      router_id:
+        get_resource: "router_01"
+      subnet_id:
+        get_resource: "storage_subnet"
+
+  router_int4:
+    type: "OS::Neutron::RouterInterface"
+    properties:
+      router_id:
+        get_resource: "router_01"
+      subnet_id:
+        get_resource: "tenant_subnet"
+
   instance0_port0:
     type: "OS::Neutron::Port"
     properties:
       admin_state_up: "True"
       network_id:
-        get_resource: "mgmt_network_02"
+        get_resource: "mgmt_network"
       security_groups:
         -
           get_resource: "instance_security_group1"
+
+  instance0_port1:
+    type: "OS::Neutron::Port"
+    properties:
+      admin_state_up: "True"
+      network_id:
+        get_resource: "api_network"
+      security_groups:
+        -
+          get_resource: "instance_security_group1"
+
   floating_ip_instance0_port0:
     type: "OS::Neutron::FloatingIP"
     properties:
@@ -132,15 +191,27 @@ resources:
         get_resource: "floating_ip_instance0_port0"
       port_id:
         get_resource: "instance0_port0"
+
   instance1_port0:
     type: "OS::Neutron::Port"
     properties:
       admin_state_up: "True"
       network_id:
-        get_resource: "mgmt_network_03"
+        get_resource: "mgmt_network"
       security_groups:
         -
           get_resource: "instance_security_group1"
+
+  instance2_port0:
+    type: "OS::Neutron::Port"
+    properties:
+      admin_state_up: "True"
+      network_id:
+        get_resource: "mgmt_network"
+      security_groups:
+        -
+          get_resource: "instance_security_group1"
+
   floating_ip_instance1_port0:
     type: "OS::Neutron::FloatingIP"
     properties:
@@ -153,12 +224,26 @@ resources:
         get_resource: "floating_ip_instance1_port0"
       port_id:
         get_resource: "instance1_port0"
+        
+  floating_ip_instance2_port0:
+    type: "OS::Neutron::FloatingIP"
+    properties:
+      floating_network_id:
+        get_param: "external_network"
+  floating_ip_assoc_03:
+    type: "OS::Neutron::FloatingIPAssociation"
+    properties:
+      floatingip_id:
+        get_resource: "floating_ip_instance2_port0"
+      port_id:
+        get_resource: "instance2_port0"
+
   instance0:
     type: "OS::Nova::Server"
     properties:
-      name: "mgmt-instance-01"
+      name: "control-01"
       image: "xenial-16.04"
-      flavor: "m1.xlarge"
+      flavor: "m1.medium"
       key_name:
         get_resource: "SSHKeyPair2"
       admin_user: cloud-user
@@ -166,12 +251,15 @@ resources:
       networks:
         - port:
             get_resource: "instance0_port0"
+        - port:
+            get_resource: "instance0_port1"
+
   instance2:
     type: "OS::Nova::Server"
     properties:
-      name: "mgmt-instance-02"
+      name: "control-02"
       image: "xenial-16.04"
-      flavor: "m1.xlarge"
+      flavor: "m1.medium"
       key_name:
         get_resource: "SSHKeyPair2"
       admin_user: cloud-user
@@ -179,6 +267,21 @@ resources:
       networks:
         - port:
             get_resource: "instance1_port0"
+            
+  instance3:
+    type: "OS::Nova::Server"
+    properties:
+      name: "control-03"
+      image: "xenial-16.04"
+      flavor: "m1.medium"
+      key_name:
+        get_resource: "SSHKeyPair2"
+      admin_user: cloud-user
+      user_data_format: RAW
+      networks:
+        - port:
+            get_resource: "instance2_port0"
+
   instance0_data:
     type: "OS::Cinder::Volume"
     properties:
@@ -191,6 +294,7 @@ resources:
       volume_id:
         get_resource: "instance0_data"
       mountpoint: /dev/vdc
+
   instance2_data:
     type: "OS::Cinder::Volume"
     properties:
@@ -204,6 +308,19 @@ resources:
         get_resource: "instance2_data"
       mountpoint: /dev/vdc
 
+  instance3_data:
+    type: "OS::Cinder::Volume"
+    properties:
+      size: "10"
+  instance3_data_attach:
+    type: "OS::Cinder::VolumeAttachment"
+    properties:
+      instance_uuid:
+        get_resource: "instance3"
+      volume_id:
+        get_resource: "instance3_data"
+      mountpoint: /dev/vdc
+      
 # declaration of output parameters
 outputs:
   instance0_ip:
@@ -212,5 +329,7 @@ outputs:
   instance1_ip:
     description: IP address of the deployed instance1
     value: { get_attr: [floating_ip_instance1_port0, floating_ip_address] }
-
+  instance2_ip:
+    description: IP address of the deployed instance1
+    value: { get_attr: [floating_ip_instance2_port0, floating_ip_address] }
 
