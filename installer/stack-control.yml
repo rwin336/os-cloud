@@ -4,4 +4,6 @@
   roles:
     - install-rabbitmq-server
     - install-backend-db
+    - keystone-install
+    #- keystone-endpoint-setup
 

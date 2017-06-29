@@ -1,0 +1,7 @@
+---
+# vars file for keystone-install
+KEYSTONE_REGION: RegionOne
+ADMIN_PASSWORD: rawstack
+SERVICE_PASSWORD: rawstack
+SERVICE_TOKEN: ADMIN
+SERVICE_TENANT_NAME: service
