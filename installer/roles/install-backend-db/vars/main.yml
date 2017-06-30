@@ -1,3 +1,4 @@
 ---
 # vars file for install-backend-db
-db_password: openstack1
+DB_PASSWORD: openstack1
+DB_ADMIN: root

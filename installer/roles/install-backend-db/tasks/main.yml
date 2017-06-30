@@ -15,7 +15,7 @@
     name: mysql-server
     question: mysql-server/root_password
     vtype: password
-    value: "{{ db_password }}"
+    value: "{{ DB_PASSWORD }}"
   become: yes
   become_method: sudo
 
@@ -24,7 +24,7 @@
     name: mysql-server
     question: mysql-server/root_password_again
     vtype: password
-    value: "{{ db_password }}"
+    value: "{{ DB_PASSWORD }}"
   become: yes
   become_method: sudo
 
@@ -57,3 +57,33 @@
   become: yes
   become_method: sudo
   
+- name: Create Openstack Databases
+  mysql_db:
+    name: "{{ item }}"
+    state: present
+    login_user: "{{ DB_ADMIN }}"
+    login_password: "{{ DB_PASSWORD }}"
+  with_items:
+    - keystone
+    - glance
+    - cinder
+    - neutron
+    - nova
+  become: yes
+  become_method: sudo
+
+- name: Create Openstack DB Users
+  mysql_user:
+    name: "{{ item }}_dbu"
+    priv: '{{ item }}.*:ALL,GRANT'
+    state: present
+    login_user: "{{ DB_ADMIN }}"
+    login_password: "{{ DB_PASSWORD }}"
+  with_items:
+    - keystone
+    - glance
+    - cinder
+    - neutron
+    - nova
+  become: yes
+  become_method: sudo
