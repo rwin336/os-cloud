@@ -1,8 +1,9 @@
-[control]
-10.23.229.71
-10.23.229.76
+[os-control]
+10.23.229.70
+#10.23.229.71
+#10.23.229.76
 
-[control:vars]
+[os-control:vars]
 ansible_ssh_user=ubuntu
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
@@ -19,5 +20,4 @@ ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 [object-storage]
 
 [object-storage:vars]
-
 

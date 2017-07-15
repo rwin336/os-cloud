@@ -169,16 +169,6 @@ resources:
         -
           get_resource: "instance_security_group1"
 
-  instance0_port1:
-    type: "OS::Neutron::Port"
-    properties:
-      admin_state_up: "True"
-      network_id:
-        get_resource: "api_network"
-      security_groups:
-        -
-          get_resource: "instance_security_group1"
-
   floating_ip_instance0_port0:
     type: "OS::Neutron::FloatingIP"
     properties:
@@ -246,13 +236,11 @@ resources:
       flavor: "m1.medium"
       key_name:
         get_resource: "SSHKeyPair2"
-      admin_user: cloud-user
+      admin_user: ubuntu
       user_data_format: RAW
       networks:
         - port:
             get_resource: "instance0_port0"
-        - port:
-            get_resource: "instance0_port1"
 
   instance2:
     type: "OS::Nova::Server"
@@ -262,7 +250,7 @@ resources:
       flavor: "m1.medium"
       key_name:
         get_resource: "SSHKeyPair2"
-      admin_user: cloud-user
+      admin_user: ubuntu 
       user_data_format: RAW
       networks:
         - port:
@@ -276,7 +264,7 @@ resources:
       flavor: "m1.medium"
       key_name:
         get_resource: "SSHKeyPair2"
-      admin_user: cloud-user
+      admin_user: ubuntu
       user_data_format: RAW
       networks:
         - port:

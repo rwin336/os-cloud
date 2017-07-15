@@ -1,5 +1,6 @@
 yum install wget
 wget http://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
+source ~/openstack-configs/openrc 
 
 openstack image create xenial-16.04  --public --file ./xenial-server-cloudimg-amd64-disk1.img --container-format bare --disk-format qcow2
 +------------------+------------------------------------------------------+

@@ -1,10 +1,21 @@
 # Host Address
-HOST_IP=192.168.202.13
+HOST_IP=192.168.202.7
 
 # Keystone definitions
 KEYSTONE_REGION=RegionOne
 ADMIN_PASSWORD=rawstack
 SERVICE_PASSWORD=rawstack
 export SERVICE_TOKEN="ADMIN"
-export SERVICE_ENDPOINT="http://192.168.202.13:35357/v2.0"
+export SERVICE_ENDPOINT="http://192.168.202.7:35357/v2.0"
 SERVICE_TENANT_NAME=service
+
+
+export OS_AUTH_URL=https://192.158.202.7:5000/v3
+#export OS_CACERT=/root/openstack-configs/haproxy-ca.crt
+export OS_USERNAME=admin
+export OS_PASSWORD=rawstack
+export OS_REGION_NAME=RegionOne
+export OS_PROJECT_NAME=admin
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_IDENTITY_API_VERSION=3
